@@ -1,0 +1,4 @@
+#!/bin/csh
+/usr/java/jdk1.7.0_67/bin/javac ngat/lotus/command/test/GetCCDTemperature.java
+/usr/java/jdk1.7.0_67/bin/javac ngat/lotus/command/test/GetCCDTemperature2.java
+/usr/java/jdk1.7.0_67/bin/javac ngat/lotus/command/test/SetCCDTemperature.java

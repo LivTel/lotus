@@ -1,0 +1,3 @@
+foreach jar ( /home/dev/src/lotus/i4j/i4j-all-in-one-1.50-SNAPSHOT/lib/i4j-client-1.50-SNAPSHOT.jar /home/dev/src/lotus/i4j/i4j-all-in-one-1.50-SNAPSHOT/lib/i4j-client-examples-1.50-SNAPSHOT.jar /home/dev/src/lotus/i4j/i4j-all-in-one-1.50-SNAPSHOT/lib/logback-classic-1.1.2.jar /home/dev/src/lotus/i4j/i4j-all-in-one-1.50-SNAPSHOT/lib/logback-core-1.1.2.jar )
+	setenv CLASSPATH ${CLASSPATH}:$jar
+end

@@ -1,0 +1,31 @@
+Starlight Express Trius SX-35
+http://www.sxccd.com/sx35
+
+    Large, high resolution Kodak CCD chip, with 10,838,016 x 9uM square pixels in a 36.3 x 24.2mm array.
+    Low dark signal - Dark frames not necessary for most of the brighter deep sky objects.
+    Anti-blooming with minimal effect on linearity and no lost active area.
+    Built-in super high speed USB 2.0 interface for approx. 7 second downloads.
+    High sensitivity, approx. 51% QE at peak (green light), 31% at H alpha.
+    Back focal distance 17mm +/-1mm.
+
+
+    CCD type: Truesense KAI11002M interline CCD with low dark current and vertical anti-blooming.
+    CCD Full resolution Pixel data: Pixel size: 9uM x 9uM, Image format: 4032 x 2688 pixels
+    CCD Image area: 36.3mm (Horizontal) x 24.2mm (Vertical).
+    CCD quality: Grade 2 as standard.
+    Spectral Response: QE max at 540nM (~51%), 30% at 400nM and 660nM.
+    Readout Noise: Less than 15 electrons RMS - typically only 12 electrons.
+    Full-well capacity: Greater than 50,000 e- (unbinned)
+    Anti-blooming: Overload margin greater than 1000x.
+    Dark current: Dark frame saturation time greater than 10 hours. Less than 0.08 electrons/second @  -20C CCD temperature.
+    Data format: 16 bits.
+    System gain: 0.9 electrons per ADU
+    Computer Interface: Built-in USB 2.0 compatible interface.
+    Image download time: Typically 7 seconds at full resolution using USB 2.0.
+    Power requirements: 115VAC / 240VAC @ 12VA, or 12VDC @ 1.5A max.
+    Cooling system: Regulated constant current cooling supply with three stage thermoelectric cooler to give a CCD temperature of approximately -37C below ambient.
+    Size: 98 x 100mm black anodised aluminium barrel with 72 x 1mm thread at the CCD window end & input/output plugs at rear. CCD alignment screws are provided for setting the chip parallel to the focal plane.
+    Weight: approx. 810g.
+
+
+Truesense KAI11002M interline CCD

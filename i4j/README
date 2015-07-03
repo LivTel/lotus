@@ -1,0 +1,6 @@
+Binaries/libraries:
+http://sourceforge.net/projects/indiforjava/files/
+
+Source code:
+http://sourceforge.net/p/indiforjava/code/ci/master/tree/
+git clone git://git.code.sf.net/p/indiforjava/code indiforjava-code

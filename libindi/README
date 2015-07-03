@@ -1,0 +1,11 @@
+http://indilib.org/develop/tutorials.html
+
+svn checkout svn://svn.code.sf.net/p/indi/code/trunk/libindi
+
+http://indilib.org/develop/tutorials/107-client-development-tutorial.html
+
+Client tutorial:
+cd libindi/examples/tutorial_six
+
+cd ~dev/src/lotus/libindi/libindi/tools
+indi_setprop and indi_getprop

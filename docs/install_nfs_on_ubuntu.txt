@@ -1,0 +1,5 @@
+https://help.ubuntu.com/community/SettingUpNFSHowTo
+
+apt-get install nfs-kernel-server
+Already installed:
+apt-get install nfs-common 

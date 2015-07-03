@@ -1,0 +1,12 @@
+# $HeadURL$
+
+LOTUS_HOME	= 	lotus
+LOTUS_SRC_HOME	=	$(LT_SRC_HOME)/$(LOTUS_HOME)
+LOTUS_BIN_HOME  =       $(LT_BIN_HOME)/$(LOTUS_HOME)
+LOTUS_DOC_HOME	=	$(LT_DOC_HOME)/$(LOTUS_HOME)
+
+# log_udp library (log_udp.h is included for verbosity settings)
+LOG_UDP_HOME		= log_udp
+LOG_UDP_SRC_HOME	= $(LT_SRC_HOME)/$(LOG_UDP_HOME)
+LOG_UDP_CFLAGS		= -I$(LOG_UDP_SRC_HOME)/include
+

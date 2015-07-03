@@ -1,0 +1,9 @@
+#!/bin/csh
+set classname = $1
+foreach jar ( /home/dev/src/lotus/i4j/i4j-all-in-one-1.50-SNAPSHOT/lib/*.jar )
+	jar tvf $jar | grep $classname
+	set grep_status = $status
+	if($status == 0 ) then
+		echo "Found $classname in $jar"
+	endif
+end

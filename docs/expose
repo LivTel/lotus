@@ -1,0 +1,51 @@
+#!/bin/csh
+
+if ( $#argv != 3 ) then
+   echo "command line parameters are: exptime binning filenme"
+   exit
+endif
+
+echo "exposure time (seconds) =" $1
+echo "binning = "$2x$2
+echo "filename = " $3
+
+#make sure we are connected to camera
+indi_setprop -p 7264 "SX CCD SXVR-H35.CONNECTION.CONNECT=On"
+sleep 2
+
+#make sure we are cooling down to temperature (-15 degC)
+indi_setprop -p 7264 "SX CCD SXVR-H35.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE=-15"
+
+
+#delete old temp output file if there is one (if using CLIENT BLOB MODE)
+#rm -f SX\ CCD\ SXVR-H35.CCD1.CCD1.fits
+
+#set binning.  Note must set V and H to same value and as part of same command.
+indi_setprop -p 7264 "SX CCD SXVR-H35.CCD_BINNING.HOR_BIN="$2";VER_BIN="$2
+
+#calculate timeout in which all CCD activity must take place
+set timeout = `echo $1"+1+10/"$2 | bc`
+echo "timeout (seconds) = " $timeout
+
+#set running to receive data (if running client BLOB mode)
+##indi_setprop -p 7264 "SX CCD SXVR-H35.UPLOAD_MODE.UPLOAD_CLIENT=On"
+#indi_getprop -p 7264 -t $timeout &
+
+#or for direct local file
+indi_setprop -p 7264 "SX CCD SXVR-H35.UPLOAD_MODE.UPLOAD_LOCAL=On"
+indi_setprop -p 7264 "SX CCD SXVR-H35.UPLOAD_SETTINGS.UPLOAD_DIR=/icc/tmp"
+indi_setprop -p 7264 "SX CCD SXVR-H35.UPLOAD_SETTINGS.UPLOAD_PREFIX="$3
+#note you can do PREFIX=name_XX to get autoincrementing file numbers 
+
+#take image
+indi_setprop -p 7264 "SX CCD SXVR-H35.CCD_EXPOSURE.CCD_EXPOSURE_VALUE="$1
+
+#sleep waiting for exposure to complete
+sleep $timeout
+
+#rename temp output file (if using CLIENT BLOB mode)
+#mv -f SX\ CCD\ SXVR-H35.CCD1.CCD1.fits $3.fits
+
+
+
+

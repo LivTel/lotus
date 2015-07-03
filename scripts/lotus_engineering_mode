@@ -1,0 +1,23 @@
+#!/bin/csh
+# $HeadURL$
+# Version: $Revision: 1.1 $
+# By $Author: cjm $
+# Change lotus into engineering mode - kill all robotic control processes
+# To return to robotic control, reboot the contrl computer.
+echo "Switching to engineering mode."
+echo "This will only succeed if you are root."
+#
+# Kill any running processes
+#
+if ( -x /icc/bin/scripts/killhup.csh ) then
+    echo "Trying to kill AutoBooter."
+    /icc/bin/scripts/killhup.csh AutoBooter
+    echo "Trying to kill ngat.lotus.LOTUS."
+    /icc/bin/scripts/killhup.csh ngat.lotus.LOTUS
+    echo "Trying to kill DpRt."
+    /icc/bin/scripts/killhup.csh DpRt
+    echo "Trying to kill icsd_inet."
+    /icc/bin/scripts/killhup.csh icsd_inet
+else
+    echo "killhup not found:ENGINEERING mode FAILED."
+endif

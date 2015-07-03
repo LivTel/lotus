@@ -1,0 +1,157 @@
+#!/bin/csh
+# $Header$
+# Version: $Revision: 1.2 $
+# By $Author: cjm $
+# Install a deployment tar created by lotus_make_deployment
+# Usage:
+#	lotus_tar_install [-help] [-nodelbin] <machine>
+set delbin = 1
+set machine_name = ""
+foreach arg ( $argv )
+	switch ( $arg )
+		case "-nodelbin":
+		    set delbin = 0
+	     	    breaksw
+		case "-help":
+		    echo "$0 [-help] [-nodelbin] <machine>"
+		    echo "\t -nodelbin does not delete the binary directory before installation."
+		    exit 0
+	     	    breaksw
+		default:
+		    set machine_name = $arg
+		    breaksw
+	endsw	   
+end
+if ( "${machine_name}" == "") then
+	echo "$0 [-help] [-nodelbin] <machine>"
+	echo "\t -nodelbin does not delete the binary directory before installation."
+	exit 0
+endif
+set current_dir         = `pwd`
+set icc                 = icc
+set deployment_tar 	= "lotus_deployment_${machine_name}.tar"
+#
+# Ensure new installation files are not under /icc (which gets deleted)
+#
+echo "${current_dir}" | /bin/grep -q '/icc'
+set grep_status = $status
+if( ${grep_status} == 0 ) then
+    echo "Installation files under /icc. Move ALL file to ~eng/download/<date> and try again."
+    exit 1
+endif
+#
+# Check new installation is in current_dir
+#
+set file_list = "${deployment_tar}.gz icc_cshrc icc_cshrc_edit.awk"
+foreach file ( ${file_list} )
+    if( ! -e ${file} ) then
+        echo "Failed to find ${file}. New installation not ready to install."
+        exit 1
+    endif
+end
+#
+# Ensure LD_LIBRARY_PATH includes libraries dir so send_command below works.
+#
+if ( -d /icc/bin/lib/x86_64-linux ) then
+    if ( ${?LD_LIBRARY_PATH} == 0 ) then
+        echo "Initialising LD_LIBRARY_PATH."
+	setenv LD_LIBRARY_PATH "/usr/lib:/lib:."
+    endif
+    echo "Adding /icc/bin/lib/x86_64-linux to LD_LIBRARY_PATH."
+    setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/icc/bin/lib/x86_64-linux"
+endif
+#
+# Kill any running processes
+#
+if ( -x /icc/bin/scripts/killhup.csh ) then
+    echo "Trying to kill AutoBooter."
+    /icc/bin/scripts/killhup.csh AutoBooter
+    echo "Trying to kill LOTUS."
+    /icc/bin/scripts/killhup.csh LOTUS
+    echo "Trying to kill icsd_inet."
+    /icc/bin/scripts/killhup.csh icsd_inet
+else
+    echo "killhup not found:FAILED to stop running processess."
+endif
+#
+# Kill nfs server - /icc/lotus-data is usually mounted for the rcs machine
+#
+echo "Stopping NFS server (/icc/lotus-data is exported)..."
+/etc/init.d/nfs stop
+#
+# Delete old installation
+# DON'T delete the log directory.
+# Only delete old binaries if delbin set.
+#
+if( ${delbin} == 1 ) then
+    if( -d /${icc}/bin ) then
+	echo "Deleting /${icc}/bin directory."
+	rm -rf /${icc}/bin/*
+    endif
+endif
+#
+# Create new top level directory (if it does not already exist
+#
+if( ! -d /${icc} ) then
+    mkdir /${icc}
+endif
+#
+# Extract new installation
+#
+echo "Copying deployment tar ${current_dir}/${deployment_tar}.gz to /."
+cp ${current_dir}/${deployment_tar}.gz /
+cd /
+echo "Gunziping deployment tar ${deployment_tar}.gz."
+gunzip ${deployment_tar}.gz
+echo "Extracting deployment tar."
+tar xvf ${deployment_tar}
+echo "Removing deployment tar."
+rm -f ${deployment_tar}
+#
+# Init script setup
+# Ubuntu defaults to level 2
+#
+# Init script already copied as /etc/init.d/autobooter
+echo "Setting up autobooter initialisation script."
+set dir_list = "/etc/rc0.d /etc/rc1.d /etc/rc6.d"
+foreach dir ( ${dir_list} )
+    cd ${dir}
+    if( ! -e K01autobooter ) then
+	ln -s ../init.d/autobooter K01autobooter
+    endif
+end
+set dir_list = "/etc/rc2.d /etc/rc3.d /etc/rc4.d /etc/rc5.d"
+foreach dir ( ${dir_list} )
+    cd ${dir}
+    if( ! -e S99autobooter ) then
+	ln -s ../init.d/autobooter S99autobooter
+    endif
+end
+echo "Setting up autobooter script."
+chmod u+x /etc/init.d/autobooter
+chown root:sys /etc/init.d/autobooter
+#
+# Reseting / ownership (to stop /var/log/messages "pam_timestamp_check: pam_timestamp: `/' owner UID != 0"
+# and "pam_timestamp_check: pam_timestamp: `/' permissions are lax"
+#
+echo "Reseting up / ownership."
+chown root:root /
+chown root:root /etc
+chown root:root /etc/init.d
+chmod go-w /
+#
+# Set up /icc ownership
+#
+echo "Setting up /icc ownership."
+chown -R eng:ltdev /icc
+#
+# Editing ~eng .cshrc
+#
+echo "Editing eng .cshrc"
+cat ~eng/.cshrc | awk -f ${current_dir}/icc_cshrc_edit.awk > ~eng/.cshrc.tmp
+cat ~eng/.cshrc.tmp ${current_dir}/icc_cshrc > ~eng/.cshrc
+rm -f ~eng/.cshrc.tmp
+#
+# Finished
+#
+echo "Installation completed, please 'reboot'."

@@ -1,0 +1,25 @@
+
+xubuntu 14.10
+
+user eng
+
+sudo add-apt-repository ppa:mutlaqja/ppa
+
+
+sudo apt-get update
+
+sudo apt-get install indi-full
+sudo apt-get install ntp
+sudo apt-get install ssh
+sudo apt-get install saods9
+sudo apt-get install emacs24
+sudo apt-get install tcsh
+sudo apt-get install libjpeg62
+
+set /etc/passwd to tcsh login for user eng
+
+install starlink software collection 2014A
+
+
+
+indiserver_sx_ccd setup
