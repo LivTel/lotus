@@ -129,7 +129,7 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 	 * These are:
 	 * OBSTYPE, RUNNUM, EXPNUM, EXPTOTAL, DATE, DATE-OBS, UTSTART, MJD, EXPTIME, 
 	 * FILTER1, FILTERI1, FILTER2, FILTERI2, CONFIGID, CONFNAME, 
-	 * PRESCAN, POSTSCAN, GAIN, READNOIS, EPERDN, CCDXIMSI, CCDYIMSI, CCDSCALE, CCDRDOUT,
+	 * PRESCAN, POSTSCAN, GAIN, READNOIS, EPERDN, CCDXBIN, CCDYBIN, CCDXIMSI, CCDYIMSI, CCDSCALE, CCDRDOUT,
 	 * CCDSTEMP, CCDATEMP, CCDWMODE, CALBEFOR, CALAFTER, INSTDFOC, FILTDFOC, MYDFOCUS.
 	 * Windowing keywords CCDWXOFF, CCDWYOFF, CCDWXSIZ, CCDWYSIZ are not implemented at the moment.
 	 * Note the DATE, DATE-OBS, UTSTART and MJD keywords are given the value of the current
@@ -150,6 +150,9 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 	 * @see #lotusFitsHeaderDefaults
 	 * @see LOTUSStatus#getPropertyBoolean
 	 * @see LOTUSStatus#getPropertyDouble
+	 * @see LOTUSStatus#getBinX
+	 * @see LOTUSStatus#getBinY
+	 * @see LOTUSStatus#getExposureStartTime
 	 * @see ngat.fits.FitsHeaderDefaults#getCardImageList
 	 */
 	public boolean setFitsHeaders(COMMAND command,COMMAND_DONE done,String obsTypeString,
@@ -222,24 +225,31 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 		// The DATE,DATE-OBS and UTSTART keywords are saved using the current date/time.
 		// This is updated when the data is saved if CFITSIO is used.
 			// diddly some of these date values will be generated internally by the IDL socket server
-			date = new Date();
+			date = new Date(status.getExposureStartTime());
 		// DATE
-			//cardImage = lotusFitsHeader.get("DATE");
-			//cardImage.setValue(date);
+			cardImage = lotusFitsHeader.get("DATE");
+			cardImage.setValue(date);
 		// DATE-OBS
+			// Currently using INDI generated version
 			//cardImage = lotusFitsHeader.get("DATE-OBS");
 			//cardImage.setValue(date);
 		// UTSTART
-			//cardImage = lotusFitsHeader.get("UTSTART");
-			//cardImage.setValue(date);
+			cardImage = lotusFitsHeader.get("UTSTART");
+			cardImage.setValue(date);
 		// MJD
-			//cardImage = lotusFitsHeader.get("MJD");
-			//cardImage.setValue(date);
+			cardImage = lotusFitsHeader.get("MJD");
+			cardImage.setValue(date);
 		// EXPTIME
-			//lotus.log(Logging.VERBOSITY_VERY_VERBOSE,this.getClass().getName()+
-			//	":setFitsHeaders:EXPTIME = "+(((double)exposureTime)/1000.0)+".");
-			//cardImage = lotusFitsHeader.get("EXPTIME");
-			//cardImage.setValue(new Double(((double)exposureTime)/1000.0));
+			lotus.log(Logging.VERBOSITY_VERY_VERBOSE,this.getClass().getName()+
+				":setFitsHeaders:EXPTIME = "+(((double)exposureTime)/1000.0)+".");
+			cardImage = lotusFitsHeader.get("EXPTIME");
+			cardImage.setValue(new Double(((double)exposureTime)/1000.0));
+		// CCDXBIN
+			cardImage = lotusFitsHeader.get("CCDXBIN");
+			cardImage.setValue(new Integer(status.getBinX()));
+		// CCDYBIN
+			cardImage = lotusFitsHeader.get("CCDYBIN");
+			cardImage.setValue(new Integer(status.getBinY()));
 		// FILTER1
 			// diddly these don't exist at the moment
 			//cardImage = lotusFitsHeader.get("FILTER1");

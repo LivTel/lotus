@@ -128,9 +128,9 @@ public class CONFIGImplementation extends SETUPImplementation implements JMSComm
 	// test abort
 		if(testAbort(configCommand,configDone) == true)
 			return configDone;
-		//diddly detector.getXBin()
-		//detector.getYBin()
 		status.setCurrentMode(GET_STATUS_DONE.MODE_CONFIGURING);
+		// keep a copy of the binning used to populate the FITS headers
+		status.setBinning(detector.getXBin(),detector.getYBin());
 		// set binning
 		try
 		{

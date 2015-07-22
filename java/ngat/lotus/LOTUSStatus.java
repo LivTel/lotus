@@ -102,6 +102,14 @@ public class LOTUSStatus
 	 * The exposure length in milliseconds.
 	 */
 	private int exposureLength = 0;
+	/**
+	 * The binning factor in X used by the last CONFIG command.
+	 */
+	private int xBin = 0;
+	/**
+	 * The binning factor in Y used by the last CONFIG command.
+	 */
+	private int yBin = 0;
 
 	/**
 	 * Default constructor. Initialises the properties.
@@ -350,6 +358,39 @@ public class LOTUSStatus
 	public synchronized int getExposureLength()
 	{
 		return exposureLength;
+	}
+
+	/**
+	 * Set the last binning sent to the camera by the CONFIG command.
+	 * @param x The X binning factor.
+	 * @param y The Y binning factor.
+	 * @see #xBin
+	 * @see #yBin
+	 */
+	public synchronized void setBinning(int x,int y)
+	{
+		xBin = x;
+		yBin = y;
+	}
+
+	/**
+	 * Get the X binning factor.
+	 * @return The X binning factor.
+	 * @see #xBin
+	 */
+	public synchronized int getBinX()
+	{
+		return xBin;
+	}
+
+	/**
+	 * Get the Y binning factor.
+	 * @return The Y binning factor.
+	 * @see #yBin
+	 */
+	public synchronized int getBinY()
+	{
+		return yBin;
 	}
 
 	/**

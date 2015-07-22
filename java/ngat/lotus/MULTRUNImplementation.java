@@ -82,11 +82,16 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 	 * <li>For each exposure we do the following:
 	 *	<ul>
 	 *      <li>We call <b>clearFitsHeaders</b> to reset the FITS headers information.
+	 *      <li>We call <b>setFitsHeaders</b> to set FITS header data based on the current config.
 	 *      <li>Calls <b>getFitsHeadersFromISS</b> to get FITS headers (incorporating
 	 *              the latest  offset) from the ISS.
 	 *      <li>Adds the returned FITS headers to lotusFitsHeader.
-	 * 	<li>It generates some FITS headers from the setup, and BSS, using 
-	 *          <b>setFitsHeaders</b>
+	 *      <li>We call fitsFilename to generate a FITS filename to save data into,
+	 *          a create a leafFilename fromthis to send to the INDI server.
+	 *      <li>We call <b>ccd.expose</b> to do the exposure and save it in the specified filename.
+	 *      <li>We call <b>lotusFitsHeader.writeFitsHeader</b> to append the constructed FITS headers to the
+	 *          INDI generated FITS file.
+	 *      </ul>
 	 * <li>We set up the return values to return to the client.
 	 * </ul>
 	 * The resultant filenames or the relevant error code is put into the an object of class MULTRUN_DONE and
@@ -97,6 +102,7 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 	 * @see #moveFold
 	 * @see #clearFitsHeaders
 	 * @see #setFitsHeaders
+	 * @see #getFitsHeadersFromISS
 	 * @see #lotus
 	 * @see #ccd
 	 * @see #lotusFitsHeader
@@ -211,6 +217,13 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 			{
 				lotus.log(Logging.VERBOSITY_VERY_VERBOSE,this.getClass().getName()+
 					":processCommand:setFitsHeaders failed for index "+index+".");
+				return multRunDone;
+			}
+			// get FITS headers from ISS
+			if(getFitsHeadersFromISS(multRunCommand,multRunDone)== false)
+			{
+				lotus.log(Logging.VERBOSITY_VERY_VERBOSE,this.getClass().getName()+
+					":processCommand:getFitsHeadersFromISS failed for index "+index+".");
 				return multRunDone;
 			}
 			try
