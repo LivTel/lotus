@@ -277,6 +277,13 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 				status.setCurrentMode(GET_STATUS_DONE.MODE_IDLE);
 				return multRunDone;
 			}
+			// update FITS headers needing timestamp information
+			if(setFitsHeaderTimestamps(multRunCommand,multRunDone)== false)
+			{
+				lotus.log(Logging.VERBOSITY_VERY_VERBOSE,this.getClass().getName()+
+					":processCommand:setFitsHeaderTimestamps failed for index "+index+".");
+				return multRunDone;
+			}
 			// append FITS headers to created FITS image
 			try
 			{

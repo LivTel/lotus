@@ -272,6 +272,7 @@ public class LOTUS
 	// library logging loggers
 		copyLogHandlers(logLogger,LogManager.getLogger("ngat.net.TitServer"),null,Logging.ALL);
 		copyLogHandlers(logLogger,LogManager.getLogger("ngat.fits.FitsHeader"),null,Logging.ALL);
+		copyLogHandlers(logLogger,LogManager.getLogger("ngat.astrometry.NGATAstro"),null,Logging.ALL);
 	// ngat.lotus.ccd loggers
 		copyLogHandlers(logLogger,LogManager.getLogger("ngat.lotus.ccd.LOTUSINDIConnection"),null,Logging.ALL);
 		copyLogHandlers(logLogger,LogManager.getLogger("ngat.lotus.ccd.LOTUSINDIDevice"),null,Logging.ALL);

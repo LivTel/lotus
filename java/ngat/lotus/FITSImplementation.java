@@ -7,6 +7,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
+import ngat.astrometry.NGATAstro;
 import ngat.fits.*;
 import ngat.lotus.ccd.*;
 import ngat.message.base.*;
@@ -222,23 +223,6 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 				  ":setFitsHeaders:EXPTOTAL = "+exposureCount+".");
 			cardImage = lotusFitsHeader.get("EXPTOTAL");
 			cardImage.setValue(new Integer(exposureCount));
-		// The DATE,DATE-OBS and UTSTART keywords are saved using the current date/time.
-		// This is updated when the data is saved if CFITSIO is used.
-			// diddly some of these date values will be generated internally by the IDL socket server
-			date = new Date(status.getExposureStartTime());
-		// DATE
-			cardImage = lotusFitsHeader.get("DATE");
-			cardImage.setValue(date);
-		// DATE-OBS
-			// Currently using INDI generated version
-			//cardImage = lotusFitsHeader.get("DATE-OBS");
-			//cardImage.setValue(date);
-		// UTSTART
-			cardImage = lotusFitsHeader.get("UTSTART");
-			cardImage.setValue(date);
-		// MJD
-			cardImage = lotusFitsHeader.get("MJD");
-			cardImage.setValue(date);
 		// EXPTIME
 			lotus.log(Logging.VERBOSITY_VERY_VERBOSE,this.getClass().getName()+
 				":setFitsHeaders:EXPTIME = "+(((double)exposureTime)/1000.0)+".");
@@ -389,6 +373,87 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 		lotusFitsHeader.addKeywordValueList(list,orderNumberOffset);
 		lotus.log(Logging.VERBOSITY_INTERMEDIATE,this.getClass().getName()+
 			   ":getFitsHeadersFromISS:finished.");
+		return true;
+	}
+
+	/**
+	 * Set the timestamp keywords in the FITS headers, to the exposure start time saved in the 
+	 * LOTUSStatus object. This must be done after the exposure but before the FITS headers
+	 * are appended to the INDI generated ones, so is a separate method to setFitsHeaders.
+	 * @param command The command being implemented that made this call to the ISS. This is used
+	 * 	for error logging.
+	 * @param done A COMMAND_DONE subclass specific to the command being implemented. If an
+	 * 	error occurs the relevant fields are filled in with the error.
+	 * @see #lotus
+	 * @see LOTUS#log
+	 * @see LOTUS#error
+	 * @see #status
+	 * @see LOTUSStatus#getExposureStartTime
+	 * @see
+	 */
+	public boolean setFitsHeaderTimestamps(COMMAND command,COMMAND_DONE done)
+	{
+		FitsHeaderCardImage cardImage = null;
+		DecimalFormat twoDigits = null;
+		DecimalFormat threeDigits = null;
+		Date date = null;
+		TimeZone timeZone = null;
+		Calendar calendar = null;
+		String valueString = null;
+		double mjd;
+
+		lotus.log(Logging.VERBOSITY_INTERMEDIATE,this.getClass().getName()+
+			  ":setFitsHeaderTimestamps:Started.");
+		try
+		{
+			// get the saved exposure start time
+			date = new Date(status.getExposureStartTime());
+			timeZone = TimeZone.getTimeZone("UTC");
+			calendar = Calendar.getInstance(timeZone);
+			calendar.setTime(date);
+			// add three seconds to allow for array clear time.
+			// See fault #2312
+			// INDI timestamp:
+			// DATE-OBS= '2015-07-22T14:52:42' / UTC start date of observation
+			// My timestamps:
+			// DATE    = '2015-07-22T15:52:39.528' / [UTC] The start date of the observation
+			calendar.add(Calendar.SECOND,3);
+		// DATE
+			twoDigits = new DecimalFormat("00");
+			threeDigits = new DecimalFormat("000");
+			valueString = new String(calendar.get(Calendar.YEAR)+"-"+
+						 twoDigits.format(calendar.get(Calendar.MONTH)+1)+"-"+
+						 twoDigits.format(calendar.get(Calendar.DAY_OF_MONTH)));
+			cardImage = lotusFitsHeader.get("DATE");
+			cardImage.setValue(valueString);
+		// DATE-OBS
+			// Currently using INDI generated version
+			//cardImage = lotusFitsHeader.get("DATE-OBS");
+			//cardImage.setValue(date);
+		// UTSTART
+			valueString = new String(twoDigits.format(calendar.get(Calendar.HOUR))+":"+
+						 twoDigits.format(calendar.get(Calendar.MINUTE))+":"+
+						 twoDigits.format(calendar.get(Calendar.SECOND))+"."+
+						 threeDigits.format(calendar.get(Calendar.MILLISECOND)));
+			cardImage = lotusFitsHeader.get("UTSTART");
+			cardImage.setValue(valueString);
+		// MJD
+			mjd = NGATAstro.getMJD(calendar.getTimeInMillis());
+			cardImage = lotusFitsHeader.get("MJD");
+			cardImage.setValue(new Double(mjd));
+		}// end try
+		catch(Exception e)
+		{
+			lotus.log(Logging.VERBOSITY_INTERMEDIATE,this.getClass().getName()+
+				  ":setFitsHeaderTimestamps:An error occured whilst setting headers.");
+			String s = new String("Command "+command.getClass().getName()+
+				":Setting Fits Header Timestamps failed:");
+			lotus.error(s,e);
+			done.setErrorNum(LOTUSConstants.LOTUS_ERROR_CODE_BASE+301);
+			done.setErrorString(s+e);
+			done.setSuccessful(false);
+			return false;
+		}
 		return true;
 	}
 }
