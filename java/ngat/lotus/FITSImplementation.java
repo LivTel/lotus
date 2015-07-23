@@ -431,7 +431,7 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 			//cardImage = lotusFitsHeader.get("DATE-OBS");
 			//cardImage.setValue(date);
 		// UTSTART
-			valueString = new String(twoDigits.format(calendar.get(Calendar.HOUR))+":"+
+			valueString = new String(twoDigits.format(calendar.get(Calendar.HOUR_OF_DAY))+":"+
 						 twoDigits.format(calendar.get(Calendar.MINUTE))+":"+
 						 twoDigits.format(calendar.get(Calendar.SECOND))+"."+
 						 threeDigits.format(calendar.get(Calendar.MILLISECOND)));
