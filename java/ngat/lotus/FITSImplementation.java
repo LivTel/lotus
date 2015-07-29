@@ -456,4 +456,55 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 		}
 		return true;
 	}
+
+	/**
+	 * Create a lock file for the current (about to be or currently being generated) fits filename returned
+	 * from the fitsFilename object.
+	 * @exception IOException Thrown if the lock file creation fails.
+	 * @see #getLockFilename
+	 */
+	public void createLockFile() throws IOException
+	{
+		File lockFile = null;
+		String filename = null;
+
+		filename = getLockFilename();
+		lotus.log(Logging.VERBOSITY_INTERMEDIATE,this.getClass().getName()+
+			  ":createLockFile:Using filename:"+filename);
+		lockFile = new File(filename);
+		lockFile.createNewFile();
+	}
+
+	/**
+	 * Delete a lock file for the current fits filename returned from the fitsFilename object.
+	 * @see #getLockFilename
+	 */
+	public void deleteLockFile()
+	{
+		File lockFile = null;
+		String filename = null;
+
+		filename = getLockFilename();
+		lotus.log(Logging.VERBOSITY_INTERMEDIATE,this.getClass().getName()+
+			  ":deleteLockFile:Using filename:"+filename);
+		lockFile = new File(filename);
+		lockFile.delete();
+	}
+
+	/**
+	 * Generate a lock filename from the fitsFilename object, by getting the filename, removing everything after
+	 * the last '.' and appending '.lock'.
+	 * @see LOTUS#getFitsFilename
+	 */
+	protected String getLockFilename()
+	{
+		FitsFilename fitsFilename = null;
+		String filename = null;
+
+		fitsFilename = lotus.getFitsFilename();
+		filename = fitsFilename.getFilename();
+		filename = filename.substring(0,filename.lastIndexOf('.'));
+		filename = new String(filename+".lock");
+		return filename;
+	}
 }

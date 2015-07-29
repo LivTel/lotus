@@ -88,9 +88,11 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 	 *      <li>Adds the returned FITS headers to lotusFitsHeader.
 	 *      <li>We call fitsFilename to generate a FITS filename to save data into,
 	 *          a create a leafFilename fromthis to send to the INDI server.
+	 *      <li>We call <b>createLockFile</b> to create a lock file.
 	 *      <li>We call <b>ccd.expose</b> to do the exposure and save it in the specified filename.
 	 *      <li>We call <b>lotusFitsHeader.writeFitsHeader</b> to append the constructed FITS headers to the
 	 *          INDI generated FITS file.
+	 *      <li>We call <b>deleteLockFile</b> to delete the previously created lock file.
 	 *      </ul>
 	 * <li>We set up the return values to return to the client.
 	 * </ul>
@@ -114,6 +116,8 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 	 * @see LOTUSStatus#setExposureNumber
 	 * @see LOTUSStatus#setExposureLength
 	 * @see LOTUSStatus#setExposureStartTime
+	 * @see FITSImplementation#createLockFile
+	 * @see FITSImplementation#deleteLockFile
 	 * @see ngat.lotus.ccd.StarlightExpressTriusSX35#expose
 	 * @see ngat.fits.FitsFilename#nextMultRunNumber
 	 * @see ngat.fits.FitsFilename#setExposureCode
@@ -237,9 +241,12 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 				leafname = fitsFile.getName();
 				// now remove '.fits' as INDI driver does not want this in the filename leafname
 				leafname = leafname.substring(0,leafname.lastIndexOf('.'));
+				// create lock file
+				createLockFile();
 			}
 			catch(Exception e)
 			{
+				deleteLockFile();
 				lotus.error(this.getClass().getName()+
 					  ":processCommand:Processing FITS filename failed:",e);
 				multRunDone.setErrorNum(LOTUSConstants.LOTUS_ERROR_CODE_BASE+1204);
@@ -249,6 +256,7 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 			}
 			if(testAbort(multRunCommand,multRunDone) == true)
 			{
+				deleteLockFile();
 				status.setCurrentMode(GET_STATUS_DONE.MODE_IDLE);
 				return multRunDone;
 			}
@@ -265,6 +273,7 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 			catch(Exception e)
 			{
 				status.setCurrentMode(GET_STATUS_DONE.MODE_IDLE);
+				deleteLockFile();
 				lotus.error(this.getClass().getName()+
 					  ":processCommand:Taking exposure failed:",e);
 				multRunDone.setErrorNum(LOTUSConstants.LOTUS_ERROR_CODE_BASE+1201);
@@ -275,11 +284,13 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 			if(testAbort(multRunCommand,multRunDone) == true)
 			{
 				status.setCurrentMode(GET_STATUS_DONE.MODE_IDLE);
+				deleteLockFile();
 				return multRunDone;
 			}
 			// update FITS headers needing timestamp information
 			if(setFitsHeaderTimestamps(multRunCommand,multRunDone)== false)
 			{
+				deleteLockFile();
 				lotus.log(Logging.VERBOSITY_VERY_VERBOSE,this.getClass().getName()+
 					":processCommand:setFitsHeaderTimestamps failed for index "+index+".");
 				return multRunDone;
@@ -292,6 +303,7 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 			catch(Exception e)
 			{
 				status.setCurrentMode(GET_STATUS_DONE.MODE_IDLE);
+				deleteLockFile();
 				lotus.error(this.getClass().getName()+
 					  ":processCommand:Adding FITS headers to "+filename+" failed:",e);
 				multRunDone.setErrorNum(LOTUSConstants.LOTUS_ERROR_CODE_BASE+1205);
@@ -300,6 +312,8 @@ public class MULTRUNImplementation extends EXPOSEImplementation implements JMSCo
 				multRunDone.setSuccessful(false);
 				return multRunDone;
 			}
+			// delete lock file
+			deleteLockFile();
 			// flip images?
 			// increment exposure number
 			status.setExposureNumber(index+1);
