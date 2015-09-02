@@ -241,7 +241,7 @@ public class CONFIGImplementation extends SETUPImplementation implements JMSComm
 		instToISSDone = lotus.sendISSCommand(offsetXYCommand,serverConnectionThread);
 		if(instToISSDone.getSuccessful() == false)
 		{
-			throw new Exception(this.getClass().getName()+"ACQUIRE:"+id+"Offset X Y failed:x = "+
+			throw new Exception(this.getClass().getName()+":"+id+":Offset X Y failed:x = "+
 					    xArcsecOffset+", y = "+yArcsecOffset+":"+instToISSDone.getErrorString());
 		}
 	}
