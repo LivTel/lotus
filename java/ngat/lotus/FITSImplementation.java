@@ -13,6 +13,7 @@ import ngat.lotus.ccd.*;
 import ngat.message.base.*;
 import ngat.message.ISS_INST.*;
 import ngat.net.*;
+import ngat.phase2.LOTUSConfig;
 import ngat.util.*;
 import ngat.util.logging.*;
 
@@ -129,7 +130,7 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 	 * or internal LOTUS status.
 	 * These are:
 	 * OBSTYPE, RUNNUM, EXPNUM, EXPTOTAL, DATE, DATE-OBS, UTSTART, MJD, EXPTIME, 
-	 * FILTER1, FILTERI1, FILTER2, FILTERI2, CONFIGID, CONFNAME, 
+	 * FILTER1, FILTERI1, FILTER2, FILTERI2, CONFIGID, CONFNAME, SLITWIDT
 	 * PRESCAN, POSTSCAN, GAIN, READNOIS, EPERDN, CCDXBIN, CCDYBIN, CCDXIMSI, CCDYIMSI, CCDSCALE, CCDRDOUT,
 	 * CCDSTEMP, CCDATEMP, CCDWMODE, CALBEFOR, CALAFTER, INSTDFOC, FILTDFOC, MYDFOCUS.
 	 * Windowing keywords CCDWXOFF, CCDWYOFF, CCDWXSIZ, CCDWYSIZ are not implemented at the moment.
@@ -154,6 +155,8 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 	 * @see LOTUSStatus#getBinX
 	 * @see LOTUSStatus#getBinY
 	 * @see LOTUSStatus#getExposureStartTime
+	 * @see LOTUSStatus#getConfigName
+	 * @see LOTUSStatus#getSlitWidth
 	 * @see ngat.fits.FitsHeaderDefaults#getCardImageList
 	 */
 	public boolean setFitsHeaders(COMMAND command,COMMAND_DONE done,String obsTypeString,
@@ -249,6 +252,14 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 		// CONFNAME
 			cardImage = lotusFitsHeader.get("CONFNAME");
 			cardImage.setValue(status.getConfigName());
+		// SLITWIDT
+			cardImage = lotusFitsHeader.get("SLITWIDT");
+			if(status.getSlitWidth() == LOTUSConfig.SLIT_WIDTH_NARROW)
+				cardImage.setValue("NARROW");
+			else if(status.getSlitWidth() == LOTUSConfig.SLIT_WIDTH_WIDE)
+				cardImage.setValue("WIDE");
+			else
+				cardImage.setValue("UNKNOWN");
 		// CCDSTEMP
 			doubleValue = status.getPropertyDouble("lotus.indi.temperature.target");
 			// convert to kelvin
@@ -389,7 +400,7 @@ public class FITSImplementation extends HardwareImplementation implements JMSCom
 	 * @see LOTUS#error
 	 * @see #status
 	 * @see LOTUSStatus#getExposureStartTime
-	 * @see
+	 * @see ngat.astrometry.NGATAstro#getMJD
 	 */
 	public boolean setFitsHeaderTimestamps(COMMAND command,COMMAND_DONE done)
 	{

@@ -87,6 +87,13 @@ public class LOTUSStatus
 	 */
 	private String configName = "UNKNOWN";
 	/**
+	 * Which part of the slit the acquired object has been moved onto. The value should be one of:
+	 * SLIT_WIDTH_NARROW or SLIT_WIDTH_WIDE.
+	 * @see ngat.phase2.LOTUSConfig#SLIT_WIDTH_NARROW
+	 * @see ngat.phase2.LOTUSConfig#SLIT_WIDTH_WIDE
+	 */
+	private int slitWidth;
+	/**
 	 * The count of the number of exposures needed for the current command to be implemented.
 	 */
 	private int exposureCount = 0;
@@ -447,6 +454,30 @@ public class LOTUSStatus
 	public synchronized String getConfigName()
 	{
 		return configName;
+	}
+
+	/**
+	 * Method to set whether we have configured the target to appear on the narrow or wide part of the slit.
+	 * @param s The slit width, one of SLIT_WIDTH_NARROW or SLIT_WIDTH_WIDE.
+	 * @see #slitWidth
+	 * @see ngat.phase2.LOTUSConfig#SLIT_WIDTH_NARROW
+	 * @see ngat.phase2.LOTUSConfig#SLIT_WIDTH_WIDE
+	 */
+	public synchronized void setSlitWidth(int s)
+	{
+		slitWidth = s;
+	}
+
+	/**
+	 * Method to get whether we have configured the target to appear on the narrow or wide part of the slit.
+	 * @return The slit width, one of SLIT_WIDTH_NARROW or SLIT_WIDTH_WIDE.
+	 * @see #slitWidth
+	 * @see ngat.phase2.LOTUSConfig#SLIT_WIDTH_NARROW
+	 * @see ngat.phase2.LOTUSConfig#SLIT_WIDTH_WIDE
+	 */
+	public synchronized int getSlitWidth()
+	{
+		return slitWidth;
 	}
 
 	/**

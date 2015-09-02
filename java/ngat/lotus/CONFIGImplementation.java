@@ -83,9 +83,11 @@ public class CONFIGImplementation extends SETUPImplementation implements JMSComm
 	 *     should be over the wide part of the slit.
 	 * <li>We call setFocusOffset to send a focus offset to the ISS.
 	 * <li>It increments the unique configuration ID.
+	 * <li>We store the config name used, and the slit width, in the status object, for later retrieval to create FITS headers.
 	 * </ul>
 	 * @see ngat.phase2.LOTUSConfig
 	 * @see LOTUSStatus#setCurrentMode
+	 * @see LOTUSStatus#setSlitWidth
 	 * @see FITSImplementation#setFocusOffset
 	 * @see ngat.message.ISS_INST.GET_STATUS_DONE#MODE_IDLE
 	 * @see ngat.message.ISS_INST.GET_STATUS_DONE#MODE_CONFIGURING
@@ -199,6 +201,8 @@ public class CONFIGImplementation extends SETUPImplementation implements JMSComm
 	// Store name of configuration used in status object.
 	// This is queried when saving FITS headers to get the CONFNAME value.
 		status.setConfigName(config.getId());
+	// store slit width - this is needed for constructing the FITS headers
+		status.setSlitWidth(config.getSlitWidth());
 		status.setCurrentMode(GET_STATUS_DONE.MODE_IDLE);
 	// setup return object.
 		configDone.setErrorNum(LOTUSConstants.LOTUS_ERROR_CODE_NO_ERROR);
