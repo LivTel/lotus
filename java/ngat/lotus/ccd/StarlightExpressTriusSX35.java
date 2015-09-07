@@ -129,6 +129,11 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 	 * before throwing an exception.
 	 */
 	public final static int EXPOSURE_TIMEOUT_COUNT = 10;
+	/**
+	 * The Starlight Express SX35 appears to under-expose by 1.5s. This offset is used to correct this.
+	 * See fault #2335 .
+	 */
+	public final static double SX35_EXPOSURE_LENGTH_OFFSET = 1.5;
 
 	/**
 	 * Logger to use.
@@ -351,6 +356,7 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 	 * <li>Set the filename to save the data into, using setFilename.
 	 * <li>We set the frame type to light (normal exposure).
 	 * <li>Save a timestamp for the start of the exposure.
+	 * <li>We modify the exposure length by SX35_EXPOSURE_LENGTH_OFFSET as the CCD driver appears to underexpose.
 	 * <li>Set the exposure length property. This will cause the driver to start an exposure.
 	 * <li>Enter a loop, whilst the remaining exposure length is greater than zero 
 	 *     and the timeoutCount is less than EXPOSURE_TIMEOUT_COUNT.
@@ -374,6 +380,7 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 	 * @see #FRAME_LIGHT_ELEMENT_NAME
 	 * @see #CCD_EXPOSURE_PROPERTY_NAME
 	 * @see #CCD_EXPOSURE_VALUE_ELEMENT_NAME
+	 * @see #SX35_EXPOSURE_LENGTH_OFFSET
 	 * @see #setFilename
 	 * @see #startExposureTimestamp
 	 */
@@ -381,7 +388,7 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 	{
 		Object retval;
 		Double remainingExposureLengthObject;
-		double remainingExposureLength = 0;
+		double modifiedExposureLength,remainingExposureLength = 0;
 		int timeoutCount = 0;
 
 		logger.log(Logging.VERBOSITY_VERY_TERSE,this.getClass().getName()+":expose:Started.");
@@ -392,14 +399,19 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 		// set the frame type to light
 		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":expose:Setting frame type to light.");
 		setPropertyValue(CAMERA_DEVICE_NAME,CCD_FRAME_TYPE_PROPERTY_NAME,FRAME_LIGHT_ELEMENT_NAME,true);
-		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":expose:Starting exposure of length "+
-			   exposureLength+" seconds.");
+		// Add 1.5s to exposure length
+		// See fault #2335
+		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":expose:Modifying exposure length of "+
+			   exposureLength+" seconds to take account of SX35 underexposing.");
+		modifiedExposureLength = exposureLength+SX35_EXPOSURE_LENGTH_OFFSET;
+		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":expose:Starting exposure of modified length "+
+			   modifiedExposureLength+" seconds.");
 		// save start exposure timestamp
 		startExposureTimestamp = System.currentTimeMillis();
 		// start exposure
 		setPropertyValue(CAMERA_DEVICE_NAME,CCD_EXPOSURE_PROPERTY_NAME,CCD_EXPOSURE_VALUE_ELEMENT_NAME,
-				 exposureLength);
-		remainingExposureLength = exposureLength;
+				 modifiedExposureLength);
+		remainingExposureLength = modifiedExposureLength;
 		timeoutCount = 0;
 		while((remainingExposureLength > 0.0) && (timeoutCount < EXPOSURE_TIMEOUT_COUNT))
 		{
@@ -557,6 +569,7 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 	 * <li>Set the filename to save the data into, using setFilename.
 	 * <li>We set the frame type to dark.
 	 * <li>Save a timestamp for the start of the exposure.
+	 * <li>We modify the exposure length by SX35_EXPOSURE_LENGTH_OFFSET as the CCD driver appears to underexpose.
 	 * <li>Set the exposure length property. This will cause the driver to start an exposure.
 	 * <li>Enter a loop, whilst the remaining exposure length is greater than zero 
 	 *     and the timeoutCount is less than EXPOSURE_TIMEOUT_COUNT.
@@ -580,6 +593,7 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 	 * @see #FRAME_DARK_ELEMENT_NAME
 	 * @see #CCD_EXPOSURE_PROPERTY_NAME
 	 * @see #CCD_EXPOSURE_VALUE_ELEMENT_NAME
+	 * @see #SX35_EXPOSURE_LENGTH_OFFSET
 	 * @see #setFilename
 	 * @see #startExposureTimestamp
 	 */
@@ -587,7 +601,7 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 	{
 		Object retval;
 		Double remainingExposureLengthObject;
-		double remainingExposureLength = 0;
+		double modifiedExposureLength,remainingExposureLength = 0;
 		int timeoutCount = 0;
 
 		logger.log(Logging.VERBOSITY_VERY_TERSE,this.getClass().getName()+":dark:Started.");
@@ -598,14 +612,19 @@ public class StarlightExpressTriusSX35 extends LOTUSINDIDevice
 		// set the frame type to light
 		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":dark:Setting frame type to dark.");
 		setPropertyValue(CAMERA_DEVICE_NAME,CCD_FRAME_TYPE_PROPERTY_NAME,FRAME_DARK_ELEMENT_NAME,true);
-		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":dark:Starting dark of length "+
-			   exposureLength+" seconds.");
+		// Add 1.5s to exposure length
+		// See fault #2335
+		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":dark:Modifying dark exposure length of "+
+			   exposureLength+" seconds to take account of SX35 underexposing.");
+		modifiedExposureLength = exposureLength+SX35_EXPOSURE_LENGTH_OFFSET;
+		logger.log(Logging.VERBOSITY_TERSE,this.getClass().getName()+":dark:Starting dark of modified length "+
+			   modifiedExposureLength+" seconds.");
 		// save start exposure timestamp
 		startExposureTimestamp = System.currentTimeMillis();
 		// start exposure
 		setPropertyValue(CAMERA_DEVICE_NAME,CCD_EXPOSURE_PROPERTY_NAME,CCD_EXPOSURE_VALUE_ELEMENT_NAME,
-				 exposureLength);
-		remainingExposureLength = exposureLength;
+				 modifiedExposureLength);
+		remainingExposureLength = modifiedExposureLength;
 		timeoutCount = 0;
 		while((remainingExposureLength > 0.0) && (timeoutCount < EXPOSURE_TIMEOUT_COUNT))
 		{
