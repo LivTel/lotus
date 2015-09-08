@@ -781,7 +781,7 @@ public class LOTUS
 		LOTUSINDIConnection indiConnection = null;
 		String indiHostname = null;
 		String directoryName = null;
-		double targetTemperature;
+		double targetTemperature,exposureLengthOffset;
 		boolean debug;
 		int timeoutCount = 10;
 		int indiPortNumber;
@@ -796,6 +796,7 @@ public class LOTUS
 			// for configuring where the INDI library will put the generated FITS images
 			directoryName = status.getProperty("lotus.file.fits.directory");
 			targetTemperature = status.getPropertyDouble("lotus.indi.temperature.target");
+			exposureLengthOffset = status.getPropertyDouble("lotus.indi.exposure_length.offset");
 		}
 		catch(Exception e)
 		{
@@ -813,6 +814,7 @@ public class LOTUS
 			ccd.setDebug(debug);
 			ccd.setDataDirectory(directoryName);
 			ccd.setTemperature(targetTemperature);
+			ccd.setExposureLengthOffset(exposureLengthOffset);
 		}
 		catch(Exception e)
 		{
