@@ -270,7 +270,7 @@ echo "${dir_count} C test program directories copied, containg ${file_count} C t
 # Scripts
 #
 echo "Copying scripts..."
-set file_list = "lotus/scripts/lotus_engineering_mode scripts/killhup.csh scripts/fuser_check ccs_gui/java/lotusgui "
+set file_list = "lotus/scripts/lotus_engineering_mode lotus/scripts/lotus_warm_ccd lotus/scripts/lotus_get_ccd_temperature scripts/killhup.csh scripts/fuser_check ccs_gui/java/lotusgui "
 set file_count = 0
 cd ${dev_dir}
 foreach file ( ${file_list} )

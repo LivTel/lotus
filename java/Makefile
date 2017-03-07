@@ -5,15 +5,20 @@ include ../Makefile.common
 include ../../Makefile.common
 
 MAKE 		= make
+# The INDI libraries need at least Java v1.7
+# This javac is on ltobs9, you may need to change this for your machine
+JAVADOC		= /usr/java/jdk1.7.0_67/bin/javadoc
+
+
 DIRS 		= ngat
 JAR_FILE       	= ngat_lotus.jar
 JARLIBDIR	= $(LT_JAVALIB_HOME)
 LIBDIR		= $(LOTUS_BIN_HOME)/java/
 DOCSDIR 	= $(LOTUS_DOC_HOME)/javadocs/
 DOCFLAGS 	= -version -author -private
-JAVASRCS 	= ngat/lotus/*.java ngat/lotus/ccd/*.java 
+JAVASRCS 	= ngat/lotus/*.java ngat/lotus/ccd/*.java ngat/lotus/ccd/test/*.java 
 #ngat/lotus/test/*.java 
-JAVAPKGS	= ngat.lotus ngat.lotus.ccd
+JAVAPKGS	= ngat.lotus ngat.lotus.ccd ngat.lotus.ccd.test
 #ngat.lotus.test
 
 JAVADOCS 	= $(JAVASRCS:%.java=$(DOCSDIR)/%.html)

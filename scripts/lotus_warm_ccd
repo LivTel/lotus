@@ -1,0 +1,25 @@
+#!/bin/csh
+# Turn on comms
+indi_setprop -p 7264 "SX CCD SXVR-H35.CONNECTION.CONNECT=On"
+sleep 2
+set ambient = 10.0
+set ambient_check = 0
+# tell CCD to ramp to ambient
+echo "Telling CCD to ramp to ${ambient}."
+indi_setprop -p 7264 "SX CCD SXVR-H35.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE=${ambient}"
+# check current CCD temperature
+set result = `indi_getprop -p 7264 "SX CCD SXVR-H35.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE"`
+set temperature = `echo ${result} | awk -F= ' { print $2}'`
+echo "Current temperature: ${temperature}"
+set temperature_round = `echo ${temperature} | awk -F. ' { print $1}'`
+echo "Rounded temperature: ${temperature_round}"
+while ( ${temperature_round} < ${ambient_check} )
+# check current CCD temperature
+    set result = `indi_getprop -p 7264 "SX CCD SXVR-H35.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE"`
+    set temperature = `echo ${result} | awk -F= ' { print $2}'`
+    echo "Current temperature: ${temperature}"
+    set temperature_round = `echo ${temperature} | awk -F. ' { print $1}'`
+    echo "Rounded temperature: ${temperature_round}"
+    sleep 10
+end
+echo "Temperature now greater than ${ambient_check}"

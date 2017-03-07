@@ -1,0 +1,7 @@
+#!/bin/csh
+indi_setprop -p 7264 "SX CCD SXVR-H35.CONNECTION.CONNECT=On"
+sleep 2
+set result = `indi_getprop -p 7264 "SX CCD SXVR-H35.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE"`
+#echo $result
+set temperature = `echo ${result} | awk -F= ' { print $2}'`
+echo $temperature

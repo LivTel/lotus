@@ -5,7 +5,7 @@ include ../../../../../Makefile.common
 
 MAKE 		= make
 PACKAGEDIR	= ngat/lotus/ccd
-DIRS 		= 
+DIRS 		= test
 BINDIR 		= $(LOTUS_BIN_HOME)/java/$(PACKAGEDIR)
 SRCS 		= LOTUSINDIConnection.java  LOTUSINDIDevice.java  StarlightExpressTriusSX35.java
 OBJS 		= $(SRCS:%.java=$(BINDIR)/%.class)
